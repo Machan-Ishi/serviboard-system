@@ -1,5 +1,8 @@
 # ServiBoard - Service Management System
 
+## Description
+This system was developed as part of academic coursework focusing on service management and financial workflow automation.
+
 A web-based service management system developed using PHP and MySQL.
 
 ## Features
