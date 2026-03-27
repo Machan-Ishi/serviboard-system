@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Supabase Column Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .ok {
+      color: green;
+      margin: 8px 0;
+    }
+    .bad {
+      color: red;
+      margin: 8px 0;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Supabase Column Test</h2>
+<div id="results">Checking general_ledger...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseUrl = "https://sbfpqgczlrbofesehthf.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNiZnBxZ2N6bHJib2Zlc2VodGhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjA0MDUsImV4cCI6MjA4ODk5NjQwNX0.DXbSHRV3ed3QOQx5TnjWWVMvNTxpzLpLf2I1aE5y60A";
+
+const resultsDiv = document.getElementById("results");
+
+function addMessage(message, ok = true) {
+  const p = document.createElement("p");
+  p.className = ok ? "ok" : "bad";
+  p.textContent = message;
+  resultsDiv.appendChild(p);
+}
+
+function addBlock(title, content) {
+  const h3 = document.createElement("h3");
+  h3.textContent = title;
+  resultsDiv.appendChild(h3);
+
+  const pre = document.createElement("pre");
+  pre.textContent = content;
+  resultsDiv.appendChild(pre);
+}
+
+if (!supabaseKey || supabaseKey === "PASTE_YOUR_REAL_ANON_KEY_HERE") {
+  resultsDiv.innerHTML = "";
+  addMessage("You forgot to paste the real anon key.", false);
+} else {
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  async function inspectGeneralLedger() {
+    resultsDiv.innerHTML = "";
+
+    const { data, error } = await supabase
+      .from("general_ledger")
+      .select("*")
+      .limit(5);
+
+    if (error) {
+      addMessage("Error reading general_ledger: " + error.message, false);
+      return;
+    }
+
+    addMessage("general_ledger exists and is accessible.", true);
+
+    if (!data || data.length === 0) {
+      addMessage("The table is empty, so columns cannot be inferred from rows yet.", false);
+      addMessage("Ask your group for the column names or insert one sample row first.", false);
+      return;
+    }
+
+    const firstRow = data[0];
+    const columns = Object.keys(firstRow);
+
+    addBlock("Detected Columns", JSON.stringify(columns, null, 2));
+    addBlock("Sample Rows", JSON.stringify(data, null, 2));
+  }
+
+  inspectGeneralLedger();
+}
+</script>
+
+</body>
+</html>
